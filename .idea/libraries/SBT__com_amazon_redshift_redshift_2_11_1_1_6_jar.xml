@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="SBT: com.amazon.redshift:redshift_2.11:1.1.6:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.amazon.redshift/redshift_2.11/jars/redshift_2.11-1.1.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
