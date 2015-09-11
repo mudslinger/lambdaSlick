@@ -14,25 +14,35 @@ object Handler {
   implicit val s3 = S3().at(Region.Tokyo)
   def main(args: Array[String]): Unit = {
 
-    val f: Option[S3Object] = (for {
-      bucket <- s3.bucket("elis.tranfer.yamaokaya.com")
+    for (
+      bucket <- s3.bucket("elis.tranfer.yamaokaya.com");
       file <- bucket.getObject("shire.csv")
-    } yield(file) )
+    ){
 
-    val db = Database.forConfig("h2mem1")
-    try{
-      val readAction:DBIO[Unit] = {
-        DBIO.seq(
-          createTable(f.get.publicUrl)
-        )
-      } andThen {
-        DBIO.seq (
-          select().map(println)
-        )
-      }
+      val db = Database.forConfig("h2mem1")
 
-      Await.result( db.run(readAction),Duration.Inf))
-    } finally db.close()
+      try{
+        val purchases:TableQuery[Purchases] = TableQuery[Purchases]
+
+        val readAction:DBIO[Unit] = {
+          DBIO.seq(
+            createTable(file.publicUrl)
+          )
+        } andThen {
+          purchases.groupBy(_.vendorCode).map { case (venderCode,group) =>
+            venderCode
+          }.result.map{ v=>
+            v.foreach { x =>
+              println(x)
+              db.run(purchases.filter(_.vendorCode === x).result.map(println))
+            }
+          }
+        }
+
+        Await.result( db.run(readAction),Duration.Inf)
+      } finally db.close()
+
+    }
   }
 
   def createTable(url:URL,encoding: String = "Windows-31J") : DBIO[Int] =  {

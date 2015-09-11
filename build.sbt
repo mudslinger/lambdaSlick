@@ -12,5 +12,6 @@ libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.3.0+",
   "com.github.seratch" %% "awscala" % "0.3.+",
   "org.postgresql" % "postgresql" % "9.2-1003-jdbc4",
-  "com.amazon.redshift" %% "redshift" % "1.1.6" from "https://s3.amazonaws.com/redshift-downloads/drivers/RedshiftJDBC41-1.1.6.1006.jar"
+  "com.amazon.redshift" %% "redshift" % "1.1.6" from "https://s3.amazonaws.com/redshift-downloads/drivers/RedshiftJDBC41-1.1.6.1006.jar",
+  "info.folone" %% "poi-scala" % "0.15"
 )
