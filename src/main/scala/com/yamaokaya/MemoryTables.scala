@@ -1,8 +1,13 @@
 package com.yamaokaya
 
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import slick.driver.H2Driver.api._
 
+
+
 case class Purchase(
+                              purchasedDate: DateTime,
                               shopCode:Int,
                               shopName: String,
                               itemCode:Int,
@@ -19,6 +24,11 @@ case class Purchase(
                               )
 
 class Purchases(tag:Tag) extends Table[Purchase](tag,"PURCHASES") {
+  implicit val dateColumnType = MappedColumnType.base [DateTime,String](
+    {dt => dt.toString("yyyyMMdd")},
+    {in => DateTimeFormat.forPattern("yyyyMMdd").parseDateTime(in)}
+  )
+  def purchasedDate = column[DateTime]("仕入計上日")
   def shopCode = column[Int]("店舗コード")
   def shopName = column[String]("店舗名")
   def itemCode = column[Int]("商品コード")
@@ -33,6 +43,6 @@ class Purchases(tag:Tag) extends Table[Purchase](tag,"PURCHASES") {
   def price = column[Int]("仕入単価")
   def amount = column[Int]("仕入金額")
 
-  def * =  (shopCode,shopName,itemCode,itemName,vendorCode,vendorName,itemDivCode,itemDivName,tempZoneCode,tempZoneName,pcs,price,amount) <> (Purchase.tupled, Purchase.unapply)
+  def * =  (purchasedDate,shopCode,shopName,itemCode,itemName,vendorCode,vendorName,itemDivCode,itemDivName,tempZoneCode,tempZoneName,pcs,price,amount) <> (Purchase.tupled, Purchase.unapply)
 }
 

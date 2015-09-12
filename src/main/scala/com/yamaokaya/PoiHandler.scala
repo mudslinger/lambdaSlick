@@ -2,7 +2,6 @@ package com.yamaokaya
 
 import awscala.Region
 import awscala.s3.{S3Object, S3}
-import info.folone.scala.poi.Workbook
 
 object PoiHandler {
   implicit val s3 = S3().at(Region.Tokyo)
@@ -11,9 +10,9 @@ object PoiHandler {
       bucket <- s3.bucket("elis.transfer.yamaokaya.com")
       file <- bucket.getObject("8月度仕入照合結果_0903.xls")
     } {
-        val workbook = Workbook(is= file.getObjectContent)
+//        val workbook = Workbook(is= file.getObjectContent)
 
-      println(workbook)
+//      println(workbook)
     }
 
   }

@@ -1,6 +1,7 @@
 package com.yamaokaya
 
-import java.net.URL
+import java.net.{URL,URI}
+import java.nio.file.{FileSystems, FileSystem}
 
 import awscala.Region
 import awscala.s3.{S3Object, Bucket, S3}
@@ -9,6 +10,9 @@ import slick.driver.H2Driver.api._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import collection.JavaConversions._
+
+
 
 object Handler {
   implicit val s3 = S3().at(Region.Tokyo)
@@ -29,16 +33,14 @@ object Handler {
             createTable(file.publicUrl)
           )
         } andThen {
-          purchases.groupBy(_.vendorCode).map { case (venderCode,group) =>
-            venderCode
-          }.result.map{ v=>
-            v.foreach { x =>
-              println(x)
-              db.run(purchases.filter(_.vendorCode === x).result.map(println))
-            }
+          purchases.sortBy(_.itemCode).result.map { p :Seq[Purchase] =>
+            p.groupBy(_.vendorName).foreach( g =>
+//              bucket.putObject()
+              bucket.putObject(key = s"${g._1}.csv",bytes = g._2.toString().getBytes(),metadata = null)
+
+            )
           }
         }
-
         Await.result( db.run(readAction),Duration.Inf)
       } finally db.close()
 
@@ -50,7 +52,13 @@ object Handler {
       create table purchases as select * from csvread('#$url',null,'#$encoding')
     """
   }
-  def select() :DBIO[Seq[Int]] = {
-    sql"select * from purchases".as[(Int)]
-  }
 }
+
+//purchases.groupBy(_.vendorCode).map { case (venderCode,group) =>
+//venderCode
+//}.result.map{ v=>
+//println(v)
+//v.foreach { x =>
+//val xx = db.run(purchases.filter(_.vendorCode === x).result.map(println))
+//}
+//}

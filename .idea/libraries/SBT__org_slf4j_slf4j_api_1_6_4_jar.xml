@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="SBT: org.slf4j:slf4j-api:1.6.4:jar">
     <CLASSES>
-      <root url="jar://C:/app/activator/repository/org.slf4j/slf4j-api/1.6.4/jars/slf4j-api.jar!/" />
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.6.4.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
