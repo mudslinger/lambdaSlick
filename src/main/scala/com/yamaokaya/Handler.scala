@@ -16,6 +16,16 @@ import collection.JavaConversions._
 
 object Handler {
   implicit val s3 = S3().at(Region.Tokyo)
+
+  implicit class CSVWrapper(val p:Purchase) extends AnyVal{
+    def toCSV() =
+      s"""
+        |${p.shopCode},
+        |${p.shopName},
+        |${p.itemCode},
+        |${p.itemName}
+      """.stripMargin.stripLineEnd
+  }
   def main(args: Array[String]): Unit = {
 
     for (
@@ -34,11 +44,9 @@ object Handler {
           )
         } andThen {
           purchases.sortBy(_.itemCode).result.map { p :Seq[Purchase] =>
-            p.groupBy(_.vendorName).foreach( g =>
-//              bucket.putObject()
-              bucket.putObject(key = s"${g._1}.csv",bytes = g._2.toString().getBytes(),metadata = null)
-
-            )
+            p.groupBy(_.vendorName).map{ i =>
+              save(i,bucket)
+            }
           }
         }
         Await.result( db.run(readAction),Duration.Inf)
@@ -47,18 +55,18 @@ object Handler {
     }
   }
 
+  def save(item: (String,Seq[Purchase]),bucket :Bucket) = {
+    bucket.putObject(s"${item._1}.csv",item._2,null)
+
+  }
+
+  implicit def purchasesSequenceToCSVByteArray(records :Seq[Purchase]) : Array[Byte] = {
+    records.map(r => r.toCSV()).mkString("¥r¥n").getBytes("Windows-31J")
+  }
+
   def createTable(url:URL,encoding: String = "Windows-31J") : DBIO[Int] =  {
     sqlu"""
       create table purchases as select * from csvread('#$url',null,'#$encoding')
     """
   }
 }
-
-//purchases.groupBy(_.vendorCode).map { case (venderCode,group) =>
-//venderCode
-//}.result.map{ v=>
-//println(v)
-//v.foreach { x =>
-//val xx = db.run(purchases.filter(_.vendorCode === x).result.map(println))
-//}
-//}

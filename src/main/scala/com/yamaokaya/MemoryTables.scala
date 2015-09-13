@@ -5,7 +5,6 @@ import org.joda.time.format.DateTimeFormat
 import slick.driver.H2Driver.api._
 
 
-
 case class Purchase(
                               purchasedDate: DateTime,
                               shopCode:Int,
